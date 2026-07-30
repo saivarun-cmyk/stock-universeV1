@@ -1,0 +1,4 @@
+DATA_FILE="data/Trading_Universe.xlsx"
+CACHE_TTL=900
+HISTORY_PERIOD="2y"
+MIN_BARS=80

@@ -1,0 +1,282 @@
+# Trading System Universe - Stock & Index Configuration
+# Add/remove symbols here. No Python code changes are required.
+# After editing this file, restart Streamlit.
+
+stocks:
+  - sector: Banking
+    stock: HDFC Bank
+    ticker: HDFCBANK.NS
+  - sector: Banking
+    stock: ICICI Bank
+    ticker: ICICIBANK.NS
+  - sector: Banking
+    stock: State Bank of India
+    ticker: SBIN.NS
+  - sector: Banking
+    stock: Axis Bank
+    ticker: AXISBANK.NS
+  - sector: Banking
+    stock: Kotak Mahindra Bank
+    ticker: KOTAKBANK.NS
+  - sector: Banking
+    stock: IndusInd Bank
+    ticker: INDUSINDBK.NS
+  - sector: Banking
+    stock: Bank of Baroda
+    ticker: BANKBARODA.NS
+  - sector: Banking
+    stock: Canara Bank
+    ticker: CANBK.NS
+  - sector: Banking
+    stock: Federal Bank
+    ticker: FEDERALBNK.NS
+
+  - sector: Financials
+    stock: Bajaj Finance
+    ticker: BAJFINANCE.NS
+  - sector: Financials
+    stock: Bajaj Finserv
+    ticker: BAJAJFINSV.NS
+  - sector: Financials
+    stock: LIC Housing Finance
+    ticker: LICHSGFIN.NS
+  - sector: Financials
+    stock: PFC
+    ticker: PFC.NS
+  - sector: Financials
+    stock: REC
+    ticker: RECLTD.NS
+  - sector: Financials
+    stock: IRFC
+    ticker: IRFC.NS
+
+  - sector: Auto
+    stock: Maruti Suzuki
+    ticker: MARUTI.NS
+  - sector: Auto
+    stock: Mahindra & Mahindra
+    ticker: M&M.NS
+  - sector: Auto
+    stock: Tata Motors
+    ticker: TMPV.NS
+  - sector: Auto
+    stock: Bajaj Auto
+    ticker: BAJAJ-AUTO.NS
+  - sector: Auto
+    stock: Hero MotoCorp
+    ticker: HEROMOTOCO.NS
+  - sector: Auto
+    stock: Eicher Motors
+    ticker: EICHERMOT.NS
+
+  - sector: IT
+    stock: TCS
+    ticker: TCS.NS
+  - sector: IT
+    stock: Infosys
+    ticker: INFY.NS
+  - sector: IT
+    stock: HCLTech
+    ticker: HCLTECH.NS
+  - sector: IT
+    stock: Wipro
+    ticker: WIPRO.NS
+  - sector: IT
+    stock: Tech Mahindra
+    ticker: TECHM.NS
+  - sector: IT
+    stock: LTIMindtree
+    ticker: LTM.NS
+  - sector: IT
+    stock: Persistent Systems
+    ticker: PERSISTENT.NS
+  - sector: IT
+    stock: Coforge
+    ticker: COFORGE.NS
+  - sector: IT
+    stock: Oracle Financial Services
+    ticker: OFSS.NS
+
+  - sector: Pharma
+    stock: Sun Pharma
+    ticker: SUNPHARMA.NS
+  - sector: Pharma
+    stock: Dr Reddy's
+    ticker: DRREDDY.NS
+  - sector: Pharma
+    stock: Cipla
+    ticker: CIPLA.NS
+  - sector: Pharma
+    stock: Laurus Labs
+    ticker: LAURUSLABS.NS
+
+  - sector: Metals
+    stock: Tata Steel
+    ticker: TATASTEEL.NS
+  - sector: Metals
+    stock: JSW Steel
+    ticker: JSWSTEEL.NS
+  - sector: Metals
+    stock: Hindalco
+    ticker: HINDALCO.NS
+  - sector: Metals
+    stock: SAIL
+    ticker: SAIL.NS
+  - sector: Metals
+    stock: NALCO
+    ticker: NATIONALUM.NS
+  - sector: Metals
+    stock: Jindal Steel & Power
+    ticker: JINDALSTEL.NS
+
+  - sector: Capital Goods & Defence
+    stock: Larsen & Toubro
+    ticker: LT.NS
+  - sector: Capital Goods & Defence
+    stock: ABB India
+    ticker: ABB.NS
+  - sector: Capital Goods & Defence
+    stock: Siemens
+    ticker: SIEMENS.NS
+  - sector: Capital Goods & Defence
+    stock: CG Power
+    ticker: CGPOWER.NS
+  - sector: Capital Goods & Defence
+    stock: BHEL
+    ticker: BHEL.NS
+  - sector: Capital Goods & Defence
+    stock: HAL
+    ticker: HAL.NS
+  - sector: Capital Goods & Defence
+    stock: BEL
+    ticker: BEL.NS
+
+  - sector: Energy
+    stock: Reliance Industries
+    ticker: RELIANCE.NS
+  - sector: Energy
+    stock: ONGC
+    ticker: ONGC.NS
+  - sector: Energy
+    stock: BPCL
+    ticker: BPCL.NS
+  - sector: Energy
+    stock: NTPC
+    ticker: NTPC.NS
+  - sector: Energy
+    stock: Power Grid
+    ticker: POWERGRID.NS
+  - sector: Energy
+    stock: Coal India
+    ticker: COALINDIA.NS
+
+  - sector: Real Estate
+    stock: DLF
+    ticker: DLF.NS
+  - sector: Real Estate
+    stock: Godrej Properties
+    ticker: GODREJPROP.NS
+  - sector: Real Estate
+    stock: Prestige Estates
+    ticker: PRESTIGE.NS
+  - sector: Real Estate
+    stock: Macrotech Developers (Lodha)
+    ticker: LODHA.NS
+  - sector: Real Estate
+    stock: Oberoi Realty
+    ticker: OBEROIRLTY.NS
+
+  - sector: Consumer & Retail
+    stock: ITC
+    ticker: ITC.NS
+  - sector: Consumer & Retail
+    stock: Titan
+    ticker: TITAN.NS
+  - sector: Consumer & Retail
+    stock: Trent
+    ticker: TRENT.NS
+  - sector: Consumer & Retail
+    stock: Asian Paints
+    ticker: ASIANPAINT.NS
+  - sector: Consumer & Retail
+    stock: United Spirits
+    ticker: UNITDSPR.NS
+  - sector: Consumer & Retail
+    stock: Indian Hotels
+    ticker: INDHOTEL.NS
+  - sector: Consumer & Retail
+    stock: Page Industries
+    ticker: PAGEIND.NS
+
+  - sector: Industrials
+    stock: Cummins India
+    ticker: CUMMINSIND.NS
+  - sector: Industrials
+    stock: Polycab
+    ticker: POLYCAB.NS
+  - sector: Industrials
+    stock: Voltas
+    ticker: VOLTAS.NS
+  - sector: Industrials
+    stock: Dixon Technologies
+    ticker: DIXON.NS
+  - sector: Industrials
+    stock: InterGlobe Aviation (IndiGo)
+    ticker: INDIGO.NS
+
+  - sector: New Economy
+    stock: Eternal (Zomato)
+    ticker: ETERNAL.NS
+  - sector: New Economy
+    stock: Swiggy
+    ticker: SWIGGY.NS
+
+indexes:
+  - sector: Nifty 50
+    stock: NIFTY 50
+    ticker: ^NSEI
+  - sector: Banking
+    stock: NIFTY BANK
+    ticker: ^NSEBANK
+  - sector: Financial Services
+    stock: NIFTY FIN SERVICE
+    ticker: ^CNXFINANCE
+  - sector: PSU Banks
+    stock: NIFTY PSU BANK
+    ticker: ^CNXPSUBANK
+  - sector: IT
+    stock: NIFTY IT
+    ticker: ^CNXIT
+  - sector: Auto
+    stock: NIFTY AUTO
+    ticker: ^CNXAUTO
+  - sector: Pharma
+    stock: NIFTY PHARMA
+    ticker: ^CNXPHARMA
+  - sector: Healthcare
+    stock: NIFTY HEALTHCARE INDEX
+    ticker: ^CNXHEALTHCARE
+  - sector: FMCG
+    stock: NIFTY FMCG
+    ticker: ^CNXFMCG
+  - sector: Consumer Durables
+    stock: NIFTY CONSUMER DURABLES
+    ticker: ^CNXCONSUMER
+  - sector: Metals
+    stock: NIFTY METAL
+    ticker: ^CNXMETAL
+  - sector: Realty
+    stock: NIFTY REALTY
+    ticker: ^CNXREALTY
+  - sector: Energy
+    stock: NIFTY ENERGY
+    ticker: ^CNXENERGY
+  - sector: Oil & Gas
+    stock: NIFTY OIL & GAS
+    ticker: ^CNXOILGAS
+  - sector: Infrastructure
+    stock: NIFTY INFRA
+    ticker: ^CNXINFRA
+  - sector: Media
+    stock: NIFTY MEDIA
+    ticker: ^CNXMEDIA
