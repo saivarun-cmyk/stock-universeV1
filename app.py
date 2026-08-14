@@ -5,16 +5,18 @@ import streamlit as st
 
 from services.universe import stocks, indexes
 from services.market import scan, clear_scan_cache
-from ui.app import main, date_controls
+from ui.app import main, date_controls, market_controls, data_source_controls
 
 IST = ZoneInfo("Asia/Kolkata")
 
 st.set_page_config(page_title="Trading System Universe", page_icon="📈", layout="wide")
 
 st.sidebar.markdown("## ⚙️ Scanner")
-st.sidebar.caption("All stocks and indexes are loaded from config/universe.yaml.")
+st.sidebar.caption("Stocks/indexes are loaded from config/universe_india.yaml or config/universe_usa.yaml, based on the Market selected below.")
 st.sidebar.caption("Daily timeframe only • No price filter")
 
+market = market_controls()
+use_dhan = data_source_controls(market)
 end, auto_run, run_time = date_controls()
 run_now = st.sidebar.button("▶️ RUN SCANNER NOW", use_container_width=True, type="primary")
 
@@ -38,12 +40,14 @@ if run_now:
     st.session_state.pop("scan_signature", None)
     st.rerun()
 
-sig = ("Daily", end)
+# Market + data-source flag are part of the cache signature so switching
+# either one always forces a fresh scan instead of showing stale/mixed data.
+sig = ("Daily", market, use_dhan, end)
 if st.session_state.get("scan_signature") != sig:
-    with st.spinner("Loading daily market data and calculating indicators..."):
+    with st.spinner(f"Loading {market} daily market data and calculating indicators..."):
         started = time.time()
-        rows = scan(stocks(), end)
-        idx = scan(indexes(), end)
+        rows = scan(stocks(market), end, use_dhan)
+        idx = scan(indexes(market), end, use_dhan)
         st.session_state.update(
             scan_rows=rows, scan_indexes=idx, scan_signature=sig,
             scan_duration=time.time() - started, last_scan_at=datetime.now()
@@ -51,6 +55,8 @@ if st.session_state.get("scan_signature") != sig:
 
 meta = {
     "end": end,
+    "market": market,
+    "use_dhan": use_dhan,
     "scan_at": st.session_state.get("last_scan_at", datetime.now()),
     "duration": st.session_state.get("scan_duration", 0),
 }
