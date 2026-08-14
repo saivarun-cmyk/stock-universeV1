@@ -230,22 +230,33 @@ def fetch_nse_index(index_name, start_ts, end_ts):
 # ---------------------------------------------------------------------------
 # Orchestration
 # ---------------------------------------------------------------------------
-def fetch_daily(item, start_ts, end_ts):
+def fetch_daily(item, start_ts, end_ts, use_dhan=False):
     """
     Try providers in order for a single universe item.
-    `item` is the dict from config/universe.yaml (with 'type' set to
-    'stock' or 'index').
+    `item` is the dict from the universe config (with 'type' set to
+    'stock' or 'index', and 'market' set to 'India' or 'USA').
+    When use_dhan=True and the item is an Indian symbol, DHAN's broker API
+    is tried first (see services/dhan_provider.py), before Yahoo/NSE.
     Returns (df, source_label, resolved_symbol, error_message).
     """
     is_index = item.get("type") == "index"
+    is_india = item.get("market", "India") == "India"
     yahoo_symbol = str(item.get("ticker", "")).strip()
     nse_symbol = str(item.get("nse_symbol", "")).strip()
 
     attempts = []
+    if use_dhan and is_india and nse_symbol:
+        from services.dhan_provider import fetch_dhan
+        def _dhan_attempt():
+            df, err = fetch_dhan(item, start_ts, end_ts)
+            _dhan_attempt.last_error = err
+            return df
+        _dhan_attempt.last_error = ""
+        attempts.append(("DHAN API", _dhan_attempt))
     if yahoo_symbol:
         attempts.append(("Yahoo Finance", lambda: fetch_yfinance(yahoo_symbol, start_ts, end_ts)))
         attempts.append(("Yahoo Finance (direct)", lambda: fetch_yahoo_chart_api(yahoo_symbol, start_ts, end_ts)))
-    if nse_symbol:
+    if nse_symbol and is_india:
         if is_index:
             attempts.append(("NSE India", lambda: fetch_nse_index(nse_symbol, start_ts, end_ts)))
         else:
@@ -264,4 +275,6 @@ def fetch_daily(item, start_ts, end_ts):
         if df is not None and not df.empty:
             resolved = yahoo_symbol if "Yahoo" in label else nse_symbol
             return df, label, resolved, ""
+        if hasattr(fn, "last_error") and fn.last_error:
+            last_error = fn.last_error
     return pd.DataFrame(), "", (yahoo_symbol or nse_symbol), last_error
