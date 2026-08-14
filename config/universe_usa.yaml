@@ -1,0 +1,347 @@
+# Trading System Universe - USA Market Configuration
+# Kept in a SEPARATE file from config/universe_india.yaml on purpose so
+# Indian and US symbols are never mixed together in one scan.
+#
+# Fields:
+#   sector      -> grouping label used for the sidebar Sector filter
+#   stock       -> display name / ticker
+#   ticker      -> Yahoo Finance symbol (no exchange suffix needed for US
+#                  symbols; BRK.A/BRK.B -> BRK-A/BRK-B, COMEX continuous
+#                  futures GC1!/SI1! -> GC=F/SI=F for Yahoo compatibility)
+#   exchange    -> original listing exchange, for reference only
+#   nse_symbol  -> always blank here (NSE / DHAN fallback is India-only)
+#
+# Add/remove symbols here. No Python code changes are required.
+
+stocks:
+- sector: Technology
+  stock: AAPL
+  ticker: AAPL
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: Technology
+  stock: MSFT
+  ticker: MSFT
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: Technology
+  stock: NVDA
+  ticker: NVDA
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: Technology
+  stock: AMD
+  ticker: AMD
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: Technology
+  stock: AVGO
+  ticker: AVGO
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: Technology
+  stock: GOOGL
+  ticker: GOOGL
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: Technology
+  stock: AMAT
+  ticker: AMAT
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: Technology
+  stock: LRCX
+  ticker: LRCX
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: Technology
+  stock: META
+  ticker: META
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: Auto & Industrials
+  stock: TSLA
+  ticker: TSLA
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: Auto & Industrials
+  stock: BA
+  ticker: BA
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Healthcare & Pharma
+  stock: JNJ
+  ticker: JNJ
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Healthcare & Pharma
+  stock: LLY
+  ticker: LLY
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Auto & Industrials
+  stock: CAT
+  ticker: CAT
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Consumer & Retail
+  stock: AMZN
+  ticker: AMZN
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: Consumer & Retail
+  stock: WMT
+  ticker: WMT
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: Financials
+  stock: GS
+  ticker: GS
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Financials
+  stock: JPM
+  ticker: JPM
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Consumer & Retail
+  stock: COST
+  ticker: COST
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: Consumer & Retail
+  stock: HD
+  ticker: HD
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Consumer & Retail
+  stock: PG
+  ticker: PG
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Technology
+  stock: MU
+  ticker: MU
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: Financials
+  stock: AXP
+  ticker: AXP
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Financials
+  stock: V
+  ticker: V
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Healthcare & Pharma
+  stock: ABBV
+  ticker: ABBV
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Healthcare & Pharma
+  stock: AMGN
+  ticker: AMGN
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: Financials
+  stock: MA
+  ticker: MA
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Technology
+  stock: ORCL
+  ticker: ORCL
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Technology
+  stock: SPCX
+  ticker: SPCX
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: Technology
+  stock: PLTR
+  ticker: PLTR
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: Technology
+  stock: SNDK
+  ticker: SNDK
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: Technology
+  stock: APP
+  ticker: APP
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: Technology
+  stock: NFLX
+  ticker: NFLX
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: Financials
+  stock: BAC
+  ticker: BAC
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Consumer & Retail
+  stock: KO
+  ticker: KO
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Healthcare & Pharma
+  stock: MRK
+  ticker: MRK
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Financials
+  stock: BRK.A
+  ticker: BRK-A
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Financials
+  stock: BRK.B
+  ticker: BRK-B
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Energy
+  stock: XOM
+  ticker: XOM
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Energy
+  stock: CVX
+  ticker: CVX
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Financials
+  stock: C
+  ticker: C
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Auto & Industrials
+  stock: RTX
+  ticker: RTX
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Technology
+  stock: DELL
+  ticker: DELL
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Healthcare & Pharma
+  stock: TMO
+  ticker: TMO
+  exchange: NYSE
+  nse_symbol: ''
+- sector: Technology
+  stock: PANW
+  ticker: PANW
+  exchange: NASDAQ
+  nse_symbol: ''
+indexes:
+- sector: ETF / Thematic Index
+  stock: CIBR
+  ticker: CIBR
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: ETF / Thematic Index
+  stock: SKYY
+  ticker: SKYY
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: ETF / Thematic Index
+  stock: ITA
+  ticker: ITA
+  exchange: CBOE
+  nse_symbol: ''
+- sector: ETF / Thematic Index
+  stock: AIQ
+  ticker: AIQ
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: ETF / Thematic Index
+  stock: FDN
+  ticker: FDN
+  exchange: AMEX
+  nse_symbol: ''
+- sector: ETF / Thematic Index
+  stock: PAVE
+  ticker: PAVE
+  exchange: CBOE
+  nse_symbol: ''
+- sector: ETF / Thematic Index
+  stock: URA
+  ticker: URA
+  exchange: AMEX
+  nse_symbol: ''
+- sector: ETF / Thematic Index
+  stock: QQQ
+  ticker: QQQ
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: ETF / Thematic Index
+  stock: SOXX
+  ticker: SOXX
+  exchange: NASDAQ
+  nse_symbol: ''
+- sector: ETF / Thematic Index
+  stock: XLF
+  ticker: XLF
+  exchange: AMEX
+  nse_symbol: ''
+- sector: ETF / Thematic Index
+  stock: XLY
+  ticker: XLY
+  exchange: AMEX
+  nse_symbol: ''
+- sector: ETF / Thematic Index
+  stock: XLP
+  ticker: XLP
+  exchange: AMEX
+  nse_symbol: ''
+- sector: ETF / Thematic Index
+  stock: XLV
+  ticker: XLV
+  exchange: AMEX
+  nse_symbol: ''
+- sector: ETF / Thematic Index
+  stock: XLI
+  ticker: XLI
+  exchange: AMEX
+  nse_symbol: ''
+- sector: ETF / Thematic Index
+  stock: XLE
+  ticker: XLE
+  exchange: AMEX
+  nse_symbol: ''
+- sector: ETF / Thematic Index
+  stock: XLC
+  ticker: XLC
+  exchange: AMEX
+  nse_symbol: ''
+- sector: ETF / Thematic Index
+  stock: XLB
+  ticker: XLB
+  exchange: AMEX
+  nse_symbol: ''
+- sector: ETF / Thematic Index
+  stock: IWM
+  ticker: IWM
+  exchange: AMEX
+  nse_symbol: ''
+- sector: ETF / Thematic Index
+  stock: XLK
+  ticker: XLK
+  exchange: AMEX
+  nse_symbol: ''
+- sector: Commodity Future
+  stock: GC1!
+  ticker: GC=F
+  exchange: COMEX
+  nse_symbol: ''
+- sector: Commodity Future
+  stock: SI1!
+  ticker: SI=F
+  exchange: COMEX
+  nse_symbol: ''
