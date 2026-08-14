@@ -272,7 +272,21 @@ def _ema13_tab(stocks, indexes):
 def _formula_guide():
     from services.market import FORMULAS
     st.subheader("📐 Formula & Strategy Guide")
+    with st.expander("EMA13 Distance", expanded=True):
+        for i, rule in enumerate(FORMULAS["EMA13 Distance"], 1):
+            st.markdown(f"**{i}.** `{rule}`")
+        st.markdown("---")
+        st.markdown("**Worked example**")
+        st.markdown(
+            "- Current Price = 1020, Yesterday EMA13 = 1000\n"
+            "- EMA13 today = (1020 × 0.142857) + (1000 × 0.857143) = **1002.86**\n"
+            "- Distance % = ((1020 − 1002.86) / 1002.86) × 100 = **1.71%**\n"
+            "- Stock is **1.71% above EMA13** → shows up near the top of the "
+            "EMA13 Distance tab once ranked by Abs Distance %."
+        )
     for name, rules in FORMULAS.items():
+        if name == "EMA13 Distance":
+            continue
         with st.expander(name):
             for i, rule in enumerate(rules, 1):
                 st.markdown(f"**{i}.** `{rule}`")
