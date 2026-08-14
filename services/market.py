@@ -11,6 +11,13 @@ SCREENER_NAMES = [
 ]
 
 FORMULAS = {
+    "EMA13 Distance": [
+        "EMA13(today) = (Close × 0.142857) + (EMA13(yesterday) × 0.857143)",
+        "  — equivalent to a standard 13-period EMA, α = 2 / (13 + 1) = 0.142857",
+        "Distance % = ((Close − EMA13) / EMA13) × 100",
+        "Abs Distance % = ABS(Distance %)",
+        "Ranking: all stocks + indexes sorted ascending by Abs Distance % (closest to EMA13 first)",
+    ],
     "Bullish Universe": [
         "Close > SMA(10)",
         "SMA(10) > EMA(20)",
