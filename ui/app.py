@@ -1,7 +1,10 @@
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, time as dtime
+from zoneinfo import ZoneInfo
 import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
+
+IST = ZoneInfo("Asia/Kolkata")
 
 SCREENER_NAMES = [
     "Bullish Universe", "Bearish Universe", "Bullish Reclaim",
@@ -40,7 +43,34 @@ def date_controls():
     else:
         end = st.sidebar.date_input("Custom Date", today, key="custom_daily_date")
     st.sidebar.caption(f"Scan through: **{end}**")
-    return end
+
+    now_ist = datetime.now(IST)
+    st.sidebar.markdown("### ⏱️ Auto-Run (IST)")
+    auto_run = st.sidebar.toggle(
+        "Auto-run once per day at set time",
+        value=st.session_state.get("auto_run_enabled", False),
+        key="auto_run_enabled",
+        help=(
+            "When the app is open (or reloaded) at/after this IST time, it "
+            "triggers RUN SCANNER NOW automatically, once per calendar day. "
+            "Streamlit has no background scheduler of its own, so this only "
+            "fires while someone/something has the app open — for a true "
+            "unattended 3 PM run, schedule `streamlit run app.py` (or hit "
+            "this URL) via cron / a hosting platform's scheduler."
+        ),
+    )
+    run_time = st.sidebar.time_input(
+        "Daily run time (IST)", value=st.session_state.get("auto_run_time", dtime(15, 0)),
+        key="auto_run_time",
+    )
+    if now_ist.time() < dtime(15, 30):
+        st.sidebar.caption(
+            f"🕒 IST now: {now_ist.strftime('%H:%M:%S')} — NSE closes 3:30 PM IST, "
+            "so today's daily candle may still be forming if you scan before then."
+        )
+    else:
+        st.sidebar.caption(f"🕒 IST now: {now_ist.strftime('%H:%M:%S')} — today's daily candle should be final.")
+    return end, auto_run, run_time
 
 def chart(df, key, title):
     if df is None or df.empty:
@@ -98,6 +128,7 @@ def _table(rows, key):
             "Stock": r.get("Stock", ""),
             "Ticker": r.get("Ticker", ""),
             "Scan End": r.get("Scan End", ""),
+            "Source": r.get("Data Source", "") or ("—" if r.get("Status") != "DATA UNAVAILABLE" else "None"),
         })
     st.dataframe(
         pd.DataFrame(data),
@@ -107,6 +138,7 @@ def _table(rows, key):
             "Signal": st.column_config.TextColumn("SIGNAL", width="medium"),
             "Strength": st.column_config.TextColumn("STRENGTH"),
             "Score": st.column_config.TextColumn("SCORE"),
+            "Source": st.column_config.TextColumn("DATA SOURCE"),
         },
         key=key,
     )
@@ -162,11 +194,80 @@ def _indexes(rows):
     _table(rows, "indexes_table")
     unavailable = [r for r in rows if r.get("Status") == "DATA UNAVAILABLE"]
     if unavailable:
-        st.warning("Some configured NSE sector indexes are not available from Yahoo Finance. They are shown as DATA UNAVAILABLE instead of repeatedly generating 404 errors.")
+        st.warning("These symbols returned no data from Yahoo Finance, the direct Yahoo API, or the NSE India fallback.")
         st.dataframe(pd.DataFrame([{
-            "Index": r.get("Symbol",""), "Configured Yahoo Symbol": r.get("Ticker",""),
+            "Index": r.get("Symbol",""), "Configured Yahoo Symbol": r.get("Ticker","") or "(none)",
             "Reason": r.get("Error","")
         } for r in unavailable]), use_container_width=True, hide_index=True)
+
+def _ema13_tab(stocks, indexes):
+    st.subheader("📏 EMA13 Distance Scanner")
+    st.caption(
+        "EMA13 = (Close × 0.142857) + (Yesterday EMA13 × 0.857143)  •  "
+        "Distance % = ((Close − EMA13) / EMA13) × 100  •  "
+        "Ranked by absolute distance, closest to EMA13 first."
+    )
+
+    scope = st.radio(
+        "Show", ["Stocks + Indexes", "Stocks Only", "Indexes Only"],
+        horizontal=True, key="ema13_scope",
+    )
+    if scope == "Stocks Only":
+        pool = [dict(r, Type="Stock") for r in stocks]
+    elif scope == "Indexes Only":
+        pool = [dict(r, Type="Index") for r in indexes]
+    else:
+        pool = [dict(r, Type="Stock") for r in stocks] + [dict(r, Type="Index") for r in indexes]
+
+    usable = [r for r in pool if r.get("EMA13 Abs Distance %") is not None]
+    unavailable = [r for r in pool if r.get("EMA13 Abs Distance %") is None]
+
+    if not usable:
+        st.info("No EMA13 values available yet — data may still be loading or unavailable for this selection.")
+        return
+
+    ranked = sorted(usable, key=lambda r: r["EMA13 Abs Distance %"])
+
+    c1, c2, c3 = st.columns(3)
+    above = sum(1 for r in ranked if r["EMA13 Distance %"] > 0)
+    below = sum(1 for r in ranked if r["EMA13 Distance %"] < 0)
+    c1.metric("Total Ranked", len(ranked))
+    c2.metric("🟢 Above EMA13", above)
+    c3.metric("🔴 Below EMA13", below)
+
+    data = []
+    for i, r in enumerate(ranked, 1):
+        dist = r["EMA13 Distance %"]
+        data.append({
+            "Rank": i,
+            "Side": "🟢 Above" if dist > 0 else ("🔴 Below" if dist < 0 else "⚪ At"),
+            "Type": r.get("Type", ""),
+            "Sector": r.get("Sector", ""),
+            "Name": r.get("Stock", ""),
+            "Ticker": r.get("Ticker", ""),
+            "Close": round(r.get("Close", 0) or 0, 2),
+            "EMA13": round(r.get("EMA13", 0) or 0, 2),
+            "Distance %": round(dist, 2),
+            "Abs Distance %": round(r["EMA13 Abs Distance %"], 2),
+            "Candle Used": r.get("Scan End", ""),
+            "Source": r.get("Data Source", ""),
+        })
+    st.dataframe(
+        pd.DataFrame(data),
+        use_container_width=True, hide_index=True,
+        column_config={
+            "Distance %": st.column_config.NumberColumn(format="%.2f%%"),
+            "Abs Distance %": st.column_config.NumberColumn(format="%.2f%%"),
+        },
+        key="ema13_table",
+    )
+
+    if unavailable:
+        with st.expander(f"⚠️ {len(unavailable)} symbol(s) without enough data for EMA13"):
+            st.dataframe(pd.DataFrame([{
+                "Type": r.get("Type", ""), "Name": r.get("Stock", ""),
+                "Ticker": r.get("Ticker", ""), "Reason": r.get("Error", "Not enough daily bars yet"),
+            } for r in unavailable]), use_container_width=True, hide_index=True)
 
 def _formula_guide():
     from services.market import FORMULAS
@@ -190,7 +291,8 @@ def main(stocks, indexes, meta):
         "🟢 Bullish Reclaim", "🟢 Bullish Pullback",
         "🔴 Bearish Breakdown", "🔴 Bearish Pullback",
         "🔻 Bearish Continuation", "📦 Darvas",
-        "📋 Complete Stocks List", "🇮🇳 INDIA INDEXES", "📐 Formula Guide",
+        "📋 Complete Stocks List", "🇮🇳 INDIA INDEXES",
+        "📏 EMA13 Distance", "📐 Formula Guide",
     ])
 
     selected = _filtered(stocks, sector)
@@ -208,4 +310,6 @@ def main(stocks, indexes, meta):
     with tabs[10]:
         _indexes(indexes)
     with tabs[11]:
+        _ema13_tab(stocks, indexes)
+    with tabs[12]:
         _formula_guide()
