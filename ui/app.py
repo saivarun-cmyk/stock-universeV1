@@ -24,6 +24,48 @@ REGIME_STYLE = {
     "DATA UNAVAILABLE": ("⚠️", "DATA UNAVAILABLE", "Unavailable"),
 }
 
+def market_controls():
+    st.sidebar.markdown("### 🌍 Market")
+    market = st.sidebar.selectbox(
+        "Select market", ["🇮🇳 India", "🇺🇸 USA"], key="market_select",
+    )
+    market = "India" if "India" in market else "USA"
+    st.sidebar.caption(
+        "India and USA symbols are scanned and shown completely separately — "
+        "switching this reloads a different universe file, never a mixed list."
+    )
+    return market
+
+def data_source_controls(market):
+    """DHAN broker API toggle — India only (Dhan does not cover US markets)."""
+    if market != "India":
+        return False
+    st.sidebar.markdown("### 🔌 India Data Source")
+    use_dhan = st.sidebar.toggle(
+        "Use DHAN broker API as primary source",
+        value=st.session_state.get("use_dhan", False),
+        key="use_dhan",
+        help=(
+            "ON: try DHAN's official Data API first for every Indian symbol, "
+            "then fall back to Yahoo → NSE India if DHAN has no data.\n"
+            "OFF (default): Yahoo Finance → Yahoo (direct) → NSE India, as before.\n\n"
+            "Note: this uses DhanHQ's own historical-data API, not TradingView — "
+            "Dhan's TradingView charts are a visual widget only, there's no public "
+            "TradingView data-pull endpoint exposed through Dhan."
+        ),
+    )
+    if use_dhan:
+        from services.dhan_provider import get_credentials
+        client_id, token = get_credentials()
+        if not client_id or not token:
+            with st.sidebar.expander("🔑 Enter DHAN credentials", expanded=True):
+                st.caption("Session-only — not saved to disk. For a persistent setup, add these to `.streamlit/secrets.toml` instead.")
+                st.text_input("DHAN Client ID", key="dhan_client_id")
+                st.text_input("DHAN Access Token", key="dhan_access_token", type="password")
+        else:
+            st.sidebar.success("DHAN credentials detected ✓")
+    return use_dhan
+
 def date_controls():
     st.sidebar.markdown("### 📅 Daily Scan")
     choice = st.sidebar.selectbox(
@@ -188,13 +230,18 @@ def _complete(rows):
         chart(row["Frame"], f"complete_chart_{row['Ticker']}", f"Daily — {row['Stock']}")
         st.caption(f"Data used: {row['Scan Start']} → {row['Scan End']}")
 
-def _indexes(rows):
-    st.subheader("🇮🇳 INDIA INDEXES")
+def _indexes(rows, market):
+    label = "🇮🇳 INDIA INDEXES" if market == "India" else "🇺🇸 USA INDEXES / ETFs"
+    st.subheader(label)
     st.caption("Daily only. Indexes use the same scanner formulas as stocks.")
     _table(rows, "indexes_table")
     unavailable = [r for r in rows if r.get("Status") == "DATA UNAVAILABLE"]
     if unavailable:
-        st.warning("These symbols returned no data from Yahoo Finance, the direct Yahoo API, or the NSE India fallback.")
+        source_note = (
+            "Yahoo Finance, the direct Yahoo API, the DHAN broker API, or the NSE India fallback"
+            if market == "India" else "Yahoo Finance or the direct Yahoo API"
+        )
+        st.warning(f"These symbols returned no data from {source_note}.")
         st.dataframe(pd.DataFrame([{
             "Index": r.get("Symbol",""), "Configured Yahoo Symbol": r.get("Ticker","") or "(none)",
             "Reason": r.get("Error","")
@@ -292,9 +339,12 @@ def _formula_guide():
                 st.markdown(f"**{i}.** `{rule}`")
 
 def main(stocks, indexes, meta):
-    st.markdown("# 📈 TRADING SYSTEM UNIVERSE")
+    market = meta.get("market", "India")
+    flag = "🇮🇳" if market == "India" else "🇺🇸"
+    st.markdown(f"# 📈 TRADING SYSTEM UNIVERSE — {flag} {market}")
     st.caption("Daily • Multi-Screener Trading Scanner")
-    st.info(f"📅 **Daily scan:** {meta['end']}  •  Data through selected candle  •  Last run: {meta['scan_at'].strftime('%Y-%m-%d %H:%M:%S')}")
+    src_note = " • Source: DHAN (primary)" if meta.get("use_dhan") else ""
+    st.info(f"📅 **Daily scan:** {meta['end']}  •  Data through selected candle  •  Last run: {meta['scan_at'].strftime('%Y-%m-%d %H:%M:%S')}{src_note}")
 
     sector_values = sorted({r.get("Sector","") for r in stocks if r.get("Sector","")})
     sector = st.sidebar.selectbox("Sector", ["All Sectors"] + sector_values)
@@ -305,7 +355,7 @@ def main(stocks, indexes, meta):
         "🟢 Bullish Reclaim", "🟢 Bullish Pullback",
         "🔴 Bearish Breakdown", "🔴 Bearish Pullback",
         "🔻 Bearish Continuation", "📦 Darvas",
-        "📋 Complete Stocks List", "🇮🇳 INDIA INDEXES",
+        "📋 Complete Stocks List", f"{flag} {market.upper()} INDEXES",
         "📏 EMA13 Distance", "📐 Formula Guide",
     ])
 
@@ -322,7 +372,7 @@ def main(stocks, indexes, meta):
     with tabs[9]:
         _complete(selected)
     with tabs[10]:
-        _indexes(indexes)
+        _indexes(indexes, market)
     with tabs[11]:
         _ema13_tab(stocks, indexes)
     with tabs[12]:
