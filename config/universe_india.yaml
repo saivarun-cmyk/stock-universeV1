@@ -1,0 +1,386 @@
+# Trading System Universe - Stock & Index Configuration
+# Source: stocks.md (Sr 1-23 = NSE sector/thematic indexes, Sr 24-92 = stocks)
+#
+# Fields:
+#   sector      -> grouping label used for the sidebar Sector filter
+#   stock       -> display name
+#   ticker      -> Yahoo Finance symbol (leave blank "" if Yahoo has no
+#                  reliable symbol for this index; the app will skip Yahoo
+#                  and go straight to the NSE India fallback)
+#   nse_symbol  -> NSE India symbol (stocks) or official NSE index name
+#                  (indexes), used as the alternate/fallback data source
+#                  when Yahoo Finance has no data or errors out.
+#
+# Add/remove symbols here. No Python code changes are required.
+# After editing this file, restart Streamlit / click RUN SCANNER NOW.
+
+stocks:
+- sector: Auto Ancillary
+  stock: Samvardhana Motherson International Ltd
+  ticker: MOTHERSON.NS
+  nse_symbol: MOTHERSON
+- sector: Consumer Durables
+  stock: Pg Electroplast Limited
+  ticker: PGEL.NS
+  nse_symbol: PGEL
+- sector: IT
+  stock: Tata Consultancy Services Limited
+  ticker: TCS.NS
+  nse_symbol: TCS
+- sector: Auto Ancillary
+  stock: Sona BLW Precision Forgings Ltd
+  ticker: SONACOMS.NS
+  nse_symbol: SONACOMS
+- sector: Metals
+  stock: Hindalco Industries Limited
+  ticker: HINDALCO.NS
+  nse_symbol: HINDALCO
+- sector: IT
+  stock: LTM Limited
+  ticker: LTM.NS
+  nse_symbol: LTM
+- sector: Consumer & Retail
+  stock: Jubilant Foodworks Limited
+  ticker: JUBLFOOD.NS
+  nse_symbol: JUBLFOOD
+- sector: Auto
+  stock: Mahindra & Mahindra Limited
+  ticker: M&M.NS
+  nse_symbol: M&M
+- sector: Auto Ancillary
+  stock: Bharat Forge Limited
+  ticker: BHARATFORG.NS
+  nse_symbol: BHARATFORG
+- sector: Auto Ancillary
+  stock: Bosch Limited
+  ticker: BOSCHLTD.NS
+  nse_symbol: BOSCHLTD
+- sector: Metals
+  stock: Hindustan Zinc Limited
+  ticker: HINDZINC.NS
+  nse_symbol: HINDZINC
+- sector: IT
+  stock: Mphasis Limited
+  ticker: MPHASIS.NS
+  nse_symbol: MPHASIS
+- sector: IT
+  stock: Hcl Technologies Limited
+  ticker: HCLTECH.NS
+  nse_symbol: HCLTECH
+- sector: Auto
+  stock: Tvs Motor Company Limited
+  ticker: TVSMOTOR.NS
+  nse_symbol: TVSMOTOR
+- sector: Metals
+  stock: Vedanta Limited
+  ticker: VEDL.NS
+  nse_symbol: VEDL
+- sector: Consumer & Retail
+  stock: Kalyan Jewellers India Ltd
+  ticker: KALYANKJIL.NS
+  nse_symbol: KALYANKJIL
+- sector: IT
+  stock: KPIT Technologies Ltd
+  ticker: KPITTECH.NS
+  nse_symbol: KPITTECH
+- sector: IT
+  stock: Infosys Limited
+  ticker: INFY.NS
+  nse_symbol: INFY
+- sector: Capital Goods & Defence
+  stock: Solar Industries India Limited
+  ticker: SOLARINDS.NS
+  nse_symbol: SOLARINDS
+- sector: Pharma
+  stock: Laurus Labs Limited
+  ticker: LAURUSLABS.NS
+  nse_symbol: LAURUSLABS
+- sector: Auto
+  stock: Eicher Motors Limited
+  ticker: EICHERMOT.NS
+  nse_symbol: EICHERMOT
+- sector: Capital Goods & Defence
+  stock: Bharat Electronics Limited
+  ticker: BEL.NS
+  nse_symbol: BEL
+- sector: Auto
+  stock: Bajaj Auto Limited
+  ticker: BAJAJ-AUTO.NS
+  nse_symbol: BAJAJ-AUTO
+- sector: IT
+  stock: Persistent Systems Limited
+  ticker: PERSISTENT.NS
+  nse_symbol: PERSISTENT
+- sector: Cement
+  stock: Ultratech Cement Limited
+  ticker: ULTRACEMCO.NS
+  nse_symbol: ULTRACEMCO
+- sector: IT
+  stock: Coforge (Niit Tech) Ltd
+  ticker: COFORGE.NS
+  nse_symbol: COFORGE
+- sector: IT
+  stock: Tech Mahindra Limited
+  ticker: TECHM.NS
+  nse_symbol: TECHM
+- sector: Auto
+  stock: Ashok Leyland Limited
+  ticker: ASHOKLEY.NS
+  nse_symbol: ASHOKLEY
+- sector: Consumer Durables
+  stock: Dixon Technologies (India) Limited
+  ticker: DIXON.NS
+  nse_symbol: DIXON
+- sector: Capital Goods & Defence
+  stock: Hindustan Aeronautics Ltd
+  ticker: HAL.NS
+  nse_symbol: HAL
+- sector: Auto
+  stock: Maruti Suzuki India Limited
+  ticker: MARUTI.NS
+  nse_symbol: MARUTI
+- sector: Capital Goods & Defence
+  stock: Bharat Dynamics Ltd
+  ticker: BDL.NS
+  nse_symbol: BDL
+- sector: New Economy
+  stock: Eternal Ltd
+  ticker: ETERNAL.NS
+  nse_symbol: ETERNAL
+- sector: Capital Goods & Defence
+  stock: Mazagon Dock Shipbuilders Ltd
+  ticker: MAZDOCK.NS
+  nse_symbol: MAZDOCK
+- sector: Metals
+  stock: Jsw Steel Limited
+  ticker: JSWSTEEL.NS
+  nse_symbol: JSWSTEEL
+- sector: Industrials
+  stock: Polycab India Ltd
+  ticker: POLYCAB.NS
+  nse_symbol: POLYCAB
+- sector: Consumer & Retail
+  stock: Titan Company Limited
+  ticker: TITAN.NS
+  nse_symbol: TITAN
+- sector: Industrials
+  stock: KEI Industries Limited
+  ticker: KEI.NS
+  nse_symbol: KEI
+- sector: New Economy
+  stock: FSN E-Commerce Ventures Limited (Nykaa)
+  ticker: NYKAA.NS
+  nse_symbol: NYKAA
+- sector: New Economy
+  stock: One 97 Communications Limited (Paytm)
+  ticker: PAYTM.NS
+  nse_symbol: PAYTM
+- sector: New Economy
+  stock: Info Edge (India) Limited
+  ticker: NAUKRI.NS
+  nse_symbol: NAUKRI
+- sector: New Economy
+  stock: PB Fintech Limited
+  ticker: POLICYBZR.NS
+  nse_symbol: POLICYBZR
+- sector: New Economy
+  stock: Swiggy Limited
+  ticker: SWIGGY.NS
+  nse_symbol: SWIGGY
+- sector: Consumer & Retail
+  stock: Trent Limited
+  ticker: TRENT.NS
+  nse_symbol: TRENT
+- sector: Capital Markets
+  stock: BSE Limited
+  ticker: BSE.NS
+  nse_symbol: BSE
+- sector: Capital Markets
+  stock: Central Depository Services (India) Limited
+  ticker: CDSL.NS
+  nse_symbol: CDSL
+- sector: Capital Markets
+  stock: Multi Commodity Exchange of India Limited
+  ticker: MCX.NS
+  nse_symbol: MCX
+- sector: Capital Markets
+  stock: Angel One Limited
+  ticker: ANGELONE.NS
+  nse_symbol: ANGELONE
+- sector: Auto
+  stock: Hero MotoCorp Limited
+  ticker: HEROMOTOCORP.NS
+  nse_symbol: HEROMOTOCORP
+- sector: Auto
+  stock: Force Motors Limited
+  ticker: FORCEMOT.NS
+  nse_symbol: FORCEMOT
+- sector: IT
+  stock: Oracle Financial Services Software Limited
+  ticker: OFSS.NS
+  nse_symbol: OFSS
+- sector: Consumer & Retail
+  stock: Radico Khaitan Limited
+  ticker: RADICO.NS
+  nse_symbol: RADICO
+- sector: FMCG
+  stock: ITC Limited
+  ticker: ITC.NS
+  nse_symbol: ITC
+- sector: Pharma
+  stock: Glenmark Pharmaceuticals Limited
+  ticker: GLENMARK.NS
+  nse_symbol: GLENMARK
+- sector: Capital Goods & Defence
+  stock: ABB India Limited
+  ticker: ABB.NS
+  nse_symbol: ABB
+- sector: Capital Goods & Defence
+  stock: Siemens Limited
+  ticker: SIEMENS.NS
+  nse_symbol: SIEMENS
+- sector: Banking
+  stock: State Bank of India
+  ticker: SBIN.NS
+  nse_symbol: SBIN
+- sector: Banking
+  stock: Union Bank of India
+  ticker: UNIONBANK.NS
+  nse_symbol: UNIONBANK
+- sector: Cement
+  stock: Grasim Industries Limited
+  ticker: GRASIM.NS
+  nse_symbol: GRASIM
+- sector: Pharma
+  stock: Zydus Lifesciences Limited
+  ticker: ZYDUSLIFE.NS
+  nse_symbol: ZYDUSLIFE
+- sector: Pharma
+  stock: Divi's Laboratories Limited
+  ticker: DIVISLAB.NS
+  nse_symbol: DIVISLAB
+- sector: Energy
+  stock: Oil and Natural Gas Corporation Limited
+  ticker: ONGC.NS
+  nse_symbol: ONGC
+- sector: Energy
+  stock: NTPC Limited
+  ticker: NTPC.NS
+  nse_symbol: NTPC
+- sector: Energy
+  stock: Inox Wind Limited
+  ticker: INOXWIND.NS
+  nse_symbol: INOXWIND
+- sector: Infrastructure
+  stock: Rail Vikas Nigam Limited
+  ticker: RVNL.NS
+  nse_symbol: RVNL
+- sector: Consumer & Retail
+  stock: United Spirits Limited
+  ticker: UNITDSPR.NS
+  nse_symbol: UNITDSPR
+- sector: Energy
+  stock: Tata Power Company Limited
+  ticker: TATAPOWER.NS
+  nse_symbol: TATAPOWER
+- sector: Consumer Durables
+  stock: Crompton Greaves Consumer Electricals Limited
+  ticker: CROMPTON.NS
+  nse_symbol: CROMPTON
+- sector: Financials
+  stock: Indian Railway Finance Corporation Limited
+  ticker: IRFC.NS
+  nse_symbol: IRFC
+indexes:
+- sector: Broad Market
+  stock: Nifty 50
+  ticker: ^NSEI
+  nse_symbol: NIFTY 50
+- sector: Broad Market
+  stock: Nifty MidCap 100
+  ticker: ''
+  nse_symbol: NIFTY MIDCAP 100
+- sector: Broad Market
+  stock: Nifty SmallCap 100
+  ticker: ''
+  nse_symbol: NIFTY SMLCAP 100
+- sector: Sectoral
+  stock: Nifty IT
+  ticker: ^CNXIT
+  nse_symbol: NIFTY IT
+- sector: Sectoral
+  stock: Nifty Pharma
+  ticker: ^CNXPHARMA
+  nse_symbol: NIFTY PHARMA
+- sector: Sectoral
+  stock: Nifty Auto
+  ticker: ^CNXAUTO
+  nse_symbol: NIFTY AUTO
+- sector: Sectoral
+  stock: Nifty Bank
+  ticker: ^NSEBANK
+  nse_symbol: NIFTY BANK
+- sector: Sectoral
+  stock: Nifty Financial Services
+  ticker: ^CNXFINANCE
+  nse_symbol: NIFTY FIN SERVICE
+- sector: Sectoral
+  stock: Nifty PSU Bank
+  ticker: ^CNXPSUBANK
+  nse_symbol: NIFTY PSU BANK
+- sector: Sectoral
+  stock: Nifty FMCG
+  ticker: ^CNXFMCG
+  nse_symbol: NIFTY FMCG
+- sector: Sectoral
+  stock: Nifty Metal
+  ticker: ^CNXMETAL
+  nse_symbol: NIFTY METAL
+- sector: Sectoral
+  stock: Nifty Energy
+  ticker: ^CNXENERGY
+  nse_symbol: NIFTY ENERGY
+- sector: Sectoral
+  stock: Nifty Realty
+  ticker: ^CNXREALTY
+  nse_symbol: NIFTY REALTY
+- sector: Sectoral
+  stock: Nifty Healthcare
+  ticker: ''
+  nse_symbol: NIFTY HEALTHCARE
+- sector: Sectoral
+  stock: Nifty Consumer Durables
+  ticker: ''
+  nse_symbol: NIFTY CONSR DURABLE
+- sector: Sectoral
+  stock: Nifty Infrastructure
+  ticker: ^CNXINFRA
+  nse_symbol: NIFTY INFRA
+- sector: Thematic
+  stock: Nifty India Internet
+  ticker: ''
+  nse_symbol: NIFTY INDIA INTERNET
+- sector: Thematic
+  stock: Nifty Capital Markets
+  ticker: ''
+  nse_symbol: NIFTY CAPITAL MKT
+- sector: Thematic
+  stock: Nifty India Defence
+  ticker: ''
+  nse_symbol: NIFTY IND DEFENCE
+- sector: Thematic
+  stock: Nifty India Digital
+  ticker: ''
+  nse_symbol: NIFTY IND DIGITAL
+- sector: Thematic
+  stock: Nifty India Manufacturing
+  ticker: ''
+  nse_symbol: NIFTY INDIA MFG
+- sector: Thematic
+  stock: Nifty EV & New Age Automotive
+  ticker: ''
+  nse_symbol: NIFTY EV
+- sector: Thematic
+  stock: Nifty India New Age Consumption
+  ticker: ''
+  nse_symbol: NIFTY NEW CONSUMP
