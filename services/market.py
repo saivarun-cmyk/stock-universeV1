@@ -72,17 +72,20 @@ FORMULAS = {
 }
 
 @st.cache_data(ttl=900, show_spinner=False)
-def download(ticker, is_index=False, end=None, nse_symbol=""):
+def download(ticker, is_index=False, end=None, nse_symbol="", market="India", use_dhan=False):
     """
-    Fetch daily OHLCV for one universe item, trying Yahoo Finance first and
-    falling back to alternate data sources (see services/providers.py) when
-    Yahoo has no usable data.
+    Fetch daily OHLCV for one universe item.
+    India: Yahoo -> Yahoo (direct) -> NSE India, with DHAN tried first if
+    use_dhan=True. USA: Yahoo -> Yahoo (direct) only (NSE/DHAN are India-only).
     Returns (df, resolved_symbol, source_label, error_message).
     """
-    item = {"ticker": ticker, "type": "index" if is_index else "stock", "nse_symbol": nse_symbol}
+    item = {
+        "ticker": ticker, "type": "index" if is_index else "stock",
+        "nse_symbol": nse_symbol, "market": market,
+    }
     end_ts = pd.Timestamp(end).normalize() if end is not None else pd.Timestamp.today().normalize()
     start_ts = end_ts - pd.Timedelta(days=900)
-    df, source, resolved, error = fetch_daily(item, start_ts, end_ts)
+    df, source, resolved, error = fetch_daily(item, start_ts, end_ts, use_dhan=use_dhan)
     if df.empty:
         return pd.DataFrame(), resolved or ticker, "", (error or "No data available from any configured data source.")
     return df, resolved, source, ""
@@ -188,14 +191,17 @@ def _checks(df, name):
     c = {k: bool(v) and pd.notna(v) for k, v in c.items()}
     return all(c.values()), c
 
-def _build(item, end):
+def _build(item, end, use_dhan=False):
     ticker = item.get("ticker", "")
     nse_symbol = item.get("nse_symbol", "")
+    market = item.get("market", "India")
     raw, resolved, source, error = download(
         ticker,
         item.get("type") == "index",
         end,
         nse_symbol,
+        market,
+        use_dhan,
     )
     if raw.empty:
         return {
@@ -203,6 +209,7 @@ def _build(item, end):
             "Stock": item.get("stock", item.get("symbol", ticker)),
             "Ticker": ticker,
             "Symbol": item.get("symbol", item.get("stock", ticker)),
+            "Market": market,
             "Resolved Ticker": resolved or "",
             "Data Source": "",
             "Error": error,
@@ -232,6 +239,7 @@ def _build(item, end):
         "Stock": item.get("stock", item.get("symbol", ticker)),
         "Ticker": ticker,
         "Symbol": item.get("symbol", item.get("stock", ticker)),
+        "Market": market,
         "Resolved Ticker": resolved,
         "Data Source": source,
         "Status": status,
@@ -250,7 +258,7 @@ def _build(item, end):
     }
 
 @st.cache_data(ttl=900, show_spinner=False)
-def scan(items, end):
+def scan(items, end, use_dhan=False):
     rows = []
     for item in items:
         try:
@@ -258,7 +266,8 @@ def scan(items, end):
             # supports older config files without requiring code edits.
             item = dict(item)
             item.setdefault("type", "index" if item.get("category") == "index" else "stock")
-            row = _build(item, end)
+            item.setdefault("market", "India")
+            row = _build(item, end, use_dhan)
             if row is not None:
                 rows.append(row)
         except Exception as exc:
