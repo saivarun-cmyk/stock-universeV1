@@ -48,13 +48,17 @@ def get_credentials():
     client_id = None
     token = None
     try:
-        client_id = st.secrets.get("DHAN_CLIENT_ID")
-        token = st.secrets.get("DHAN_ACCESS_TOKEN")
+        # client_id = st.secrets.get("DHAN_CLIENT_ID")
+        # token = st.secrets.get("DHAN_ACCESS_TOKEN")
+        client_id = "1109844367"
+        token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJkaGFuIiwicGFydG5lcklkIjoiIiwiZXhwIjoxNzg2ODIwMDMyLCJpYXQiOjE3ODY3MzM2MzIsInRva2VuQ29uc3VtZXJUeXBlIjoiU0VMRiIsIndlYmhvb2tVcmwiOiIiLCJkaGFuQ2xpZW50SWQiOiIxMTA5ODQ0MzY3In0.Vo1x553Z_6L3hsNyA0hFpqd0qZ9wYG6X8KjXaXojvN9WvUM8-BHB9_wJ_yHcqKNHuW5oiFlj6gbtK8IxgB3_cw"
+
     except Exception:
         pass
+
     client_id = client_id or st.session_state.get("dhan_client_id", "")
     token = token or st.session_state.get("dhan_access_token", "")
-    return (client_id or "").strip(), (token or "").strip()
+    return str(client_id or "").strip(), str(token or "").strip()
 
 
 @st.cache_data(ttl=6 * 3600, show_spinner=False)
@@ -65,6 +69,7 @@ def _load_scrip_master():
         resp = requests.get(SCRIP_MASTER_URL, timeout=30)
         resp.raise_for_status()
         from io import StringIO
+
         df = pd.read_csv(StringIO(resp.text), low_memory=False)
         df.columns = [c.strip() for c in df.columns]
         return df
@@ -86,29 +91,50 @@ def _resolve_security_id(nse_symbol, is_index):
         return None, "Could not download/parse Dhan's scrip master CSV."
 
     seg_col = _find_col(master, ["SEM_SEGMENT", "SEM_EXM_EXCH_ID", "EXCH_ID"])
-    sym_col = _find_col(master, ["SEM_TRADING_SYMBOL", "SEM_CUSTOM_SYMBOL", "SYMBOL_NAME"])
-    id_col = _find_col(master, ["SEM_SMST_SECURITY_ID", "SECURITY_ID", "SEM_SECURITY_ID"])
-    instrument_col = _find_col(master, ["SEM_INSTRUMENT_NAME", "SEM_EXCH_INSTRUMENT_TYPE", "INSTRUMENT_TYPE"])
+    sym_col = _find_col(
+        master, ["SEM_TRADING_SYMBOL", "SEM_CUSTOM_SYMBOL", "SYMBOL_NAME"]
+    )
+    id_col = _find_col(
+        master, ["SEM_SMST_SECURITY_ID", "SECURITY_ID", "SEM_SECURITY_ID"]
+    )
+    instrument_col = _find_col(
+        master, ["SEM_INSTRUMENT_NAME", "SEM_EXCH_INSTRUMENT_TYPE", "INSTRUMENT_TYPE"]
+    )
     exch_col = _find_col(master, ["SEM_EXM_EXCH_ID", "EXCH_ID"])
 
     if not sym_col or not id_col:
-        return None, "Unexpected scrip-master CSV format — Dhan may have changed column names."
+        return (
+            None,
+            "Unexpected scrip-master CSV format — Dhan may have changed column names.",
+        )
 
     subset = master
     if exch_col:
-        subset = subset[subset[exch_col].astype(str).str.upper().str.contains("NSE", na=False)]
+        subset = subset[
+            subset[exch_col].astype(str).str.upper().str.contains("NSE", na=False)
+        ]
     if instrument_col:
         wanted = "INDEX" if is_index else "EQUITY"
-        matched = subset[subset[instrument_col].astype(str).str.upper().str.contains(wanted, na=False)]
+        matched = subset[
+            subset[instrument_col]
+            .astype(str)
+            .str.upper()
+            .str.contains(wanted, na=False)
+        ]
         if not matched.empty:
             subset = matched
 
     needle = str(nse_symbol).strip().upper()
     hit = subset[subset[sym_col].astype(str).str.upper() == needle]
     if hit.empty:
-        hit = subset[subset[sym_col].astype(str).str.upper().str.contains(needle, na=False)]
+        hit = subset[
+            subset[sym_col].astype(str).str.upper().str.contains(needle, na=False)
+        ]
     if hit.empty:
-        return None, f"No Dhan security id found for '{nse_symbol}' ({'index' if is_index else 'equity'})."
+        return (
+            None,
+            f"No Dhan security id found for '{nse_symbol}' ({'index' if is_index else 'equity'}).",
+        )
     return str(hit.iloc[0][id_col]), ""
 
 
@@ -120,7 +146,10 @@ def fetch_dhan(item, start_ts, end_ts):
     """
     client_id, token = get_credentials()
     if not client_id or not token:
-        return pd.DataFrame(), "Dhan credentials not set (add DHAN_CLIENT_ID / DHAN_ACCESS_TOKEN in secrets or the sidebar)."
+        return (
+            pd.DataFrame(),
+            "Dhan credentials not set (add DHAN_CLIENT_ID / DHAN_ACCESS_TOKEN in secrets or the sidebar).",
+        )
 
     nse_symbol = str(item.get("nse_symbol", "")).strip()
     is_index = item.get("type") == "index"
@@ -150,18 +179,27 @@ def fetch_dhan(item, start_ts, end_ts):
     try:
         resp = requests.post(url, json=body, headers=headers, timeout=15)
         if resp.status_code != 200:
-            return pd.DataFrame(), f"Dhan API HTTP {resp.status_code}: {resp.text[:200]}"
+            return (
+                pd.DataFrame(),
+                f"Dhan API HTTP {resp.status_code}: {resp.text[:200]}",
+            )
         data = resp.json()
         if not data or "close" not in data:
-            return pd.DataFrame(), f"Unexpected Dhan API response shape: {str(data)[:200]}"
+            return (
+                pd.DataFrame(),
+                f"Unexpected Dhan API response shape: {str(data)[:200]}",
+            )
         idx = pd.to_datetime(data.get("timestamp", []), unit="s", errors="coerce")
-        df = pd.DataFrame({
-            "Open": data.get("open", []),
-            "High": data.get("high", []),
-            "Low": data.get("low", []),
-            "Close": data.get("close", []),
-            "Volume": data.get("volume", [0] * len(data.get("close", []))),
-        }, index=idx)
+        df = pd.DataFrame(
+            {
+                "Open": data.get("open", []),
+                "High": data.get("high", []),
+                "Low": data.get("low", []),
+                "Close": data.get("close", []),
+                "Volume": data.get("volume", [0] * len(data.get("close", []))),
+            },
+            index=idx,
+        )
         df = df.dropna(subset=["Close"])
         if df.empty:
             return pd.DataFrame(), "Dhan API returned no bars for this date range."
