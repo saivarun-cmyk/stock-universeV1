@@ -1,29 +1,8 @@
-import logging
 from datetime import date
 import pandas as pd
-import yfinance as yf
 import streamlit as st
 
-# Yahoo symbols that have changed over time. Only the preferred symbol is
-# requested, so stale symbols do not generate noisy 404 messages.
-TICKER_ALIASES = {
-    "TATAMOTORS.NS": "TMPV.NS",
-    "LTIM.NS": "LTM.NS",
-    "UNITEDSPIRITS.NS": "UNITDSPR.NS",
-}
-
-# Yahoo has inconsistent coverage for several NSE sector indices. Keep only
-# symbols known to be usable; unsupported configured indexes are reported in
-# the UI instead of repeatedly requesting dead Yahoo symbols.
-INDEX_ALIASES = {
-    # Yahoo coverage for several NSE sector indexes is inconsistent.
-    # None means "do not request this stale symbol"; the UI will report it
-    # cleanly rather than emitting repeated HTTP 404 messages.
-    "^CNXFINANCE": None,
-    "^CNXHEALTHCARE": None,
-    "^CNXCONSUMER": None,
-    "^CNXOILGAS": None,
-}
+from services.providers import fetch_daily
 
 SCREENER_NAMES = [
     "Bullish Universe", "Bearish Universe", "Bullish Reclaim",
@@ -85,75 +64,30 @@ FORMULAS = {
     ],
 }
 
-def _symbol(item):
-    ticker = str(item.get("ticker", "")).strip()
-    if item.get("type") == "index":
-        return INDEX_ALIASES.get(ticker, ticker)
-    return TICKER_ALIASES.get(ticker, ticker)
-
-def _download_one(symbol, end=None):
-    if not symbol:
-        return pd.DataFrame()
-
-    # Download enough history for SMA50/EMA20/20-day volume and explicitly
-    # bound the request by the selected scan date.  The previous version used
-    # `with logging.disable(...)`, but logging.disable() is not a context
-    # manager; that exception was silently caught and every symbol became
-    # DATA UNAVAILABLE.
-    try:
-        end_ts = pd.Timestamp(end).normalize() if end is not None else pd.Timestamp.today().normalize()
-        start_ts = end_ts - pd.Timedelta(days=900)
-        request_end = end_ts + pd.Timedelta(days=1)
-
-        previous_disable = logging.root.manager.disable
-        logging.disable(logging.CRITICAL)
-        try:
-            df = yf.download(
-                symbol,
-                start=start_ts.strftime("%Y-%m-%d"),
-                end=request_end.strftime("%Y-%m-%d"),
-                interval="1d",
-                auto_adjust=False,
-                progress=False,
-                threads=False,
-            )
-        finally:
-            logging.disable(previous_disable)
-    except Exception:
-        return pd.DataFrame()
-    if df is None or df.empty:
-        return pd.DataFrame()
-    if isinstance(df.columns, pd.MultiIndex):
-        df.columns = [c[0] for c in df.columns]
-    needed = ["Open", "High", "Low", "Close", "Volume"]
-    if not all(c in df.columns for c in needed):
-        return pd.DataFrame()
-    df = df[needed].apply(pd.to_numeric, errors="coerce")
-    df = df.dropna(subset=["Close"])
-    if df.empty:
-        return pd.DataFrame()
-    idx = pd.to_datetime(df.index)
-    if getattr(idx, "tz", None) is not None:
-        idx = idx.tz_localize(None)
-    df.index = idx.normalize()
-    return df
-
 @st.cache_data(ttl=900, show_spinner=False)
-def download(ticker, is_index=False, end=None):
-    item = {"ticker": ticker, "type": "index" if is_index else "stock"}
-    symbol = _symbol(item)
-    if symbol is None:
-        return pd.DataFrame(), None, "Yahoo Finance symbol is intentionally disabled for this index."
-    df = _download_one(symbol, end)
+def download(ticker, is_index=False, end=None, nse_symbol=""):
+    """
+    Fetch daily OHLCV for one universe item, trying Yahoo Finance first and
+    falling back to alternate data sources (see services/providers.py) when
+    Yahoo has no usable data.
+    Returns (df, resolved_symbol, source_label, error_message).
+    """
+    item = {"ticker": ticker, "type": "index" if is_index else "stock", "nse_symbol": nse_symbol}
+    end_ts = pd.Timestamp(end).normalize() if end is not None else pd.Timestamp.today().normalize()
+    start_ts = end_ts - pd.Timedelta(days=900)
+    df, source, resolved, error = fetch_daily(item, start_ts, end_ts)
     if df.empty:
-        return pd.DataFrame(), symbol, "No Yahoo Finance data available for this symbol."
-    return df, symbol, ""
+        return pd.DataFrame(), resolved or ticker, "", (error or "No data available from any configured data source.")
+    return df, resolved, source, ""
 
 def indicators(df):
     x = df.copy()
     x["SMA10"] = x["Close"].rolling(10, min_periods=10).mean()
     x["EMA20"] = x["Close"].ewm(span=20, adjust=False, min_periods=20).mean()
     x["SMA50"] = x["Close"].rolling(50, min_periods=50).mean()
+    # 13-period EMA, plus % distance of price from it (see EMA13 tab).
+    x["EMA13"] = x["Close"].ewm(span=13, adjust=False, min_periods=13).mean()
+    x["EMA13_Distance_%"] = ((x["Close"] - x["EMA13"]) / x["EMA13"]) * 100
     x["HighestHigh20"] = x["High"].rolling(20, min_periods=20).max()
     x["LowestLow20"] = x["Low"].rolling(20, min_periods=20).min()
     x["AvgVolume20"] = x["Volume"].rolling(20, min_periods=20).mean()
@@ -249,10 +183,12 @@ def _checks(df, name):
 
 def _build(item, end):
     ticker = item.get("ticker", "")
-    raw, resolved, error = download(
+    nse_symbol = item.get("nse_symbol", "")
+    raw, resolved, source, error = download(
         ticker,
         item.get("type") == "index",
         end,
+        nse_symbol,
     )
     if raw.empty:
         return {
@@ -261,10 +197,14 @@ def _build(item, end):
             "Ticker": ticker,
             "Symbol": item.get("symbol", item.get("stock", ticker)),
             "Resolved Ticker": resolved or "",
+            "Data Source": "",
             "Error": error,
             "Status": "DATA UNAVAILABLE",
             "Score": 0,
             "Frame": pd.DataFrame(),
+            "EMA13": None,
+            "EMA13 Distance %": None,
+            "EMA13 Abs Distance %": None,
             "Scan Start": "",
             "Scan End": str(pd.Timestamp(end).date()),
             "Screens": {},
@@ -277,16 +217,24 @@ def _build(item, end):
     for name in SCREENER_NAMES:
         matched, conditions = _checks(df, name)
         screens[name] = {"signal": matched, "conditions": conditions}
+    last = df.iloc[-1]
+    ema13 = float(last["EMA13"]) if pd.notna(last.get("EMA13")) else None
+    ema13_dist = float(last["EMA13_Distance_%"]) if pd.notna(last.get("EMA13_Distance_%")) else None
     return {
         "Sector": item.get("sector", "Index"),
         "Stock": item.get("stock", item.get("symbol", ticker)),
         "Ticker": ticker,
         "Symbol": item.get("symbol", item.get("stock", ticker)),
         "Resolved Ticker": resolved,
+        "Data Source": source,
         "Status": status,
         "Score": score,
         "Frame": df,
         "Screens": screens,
+        "Close": float(last["Close"]) if pd.notna(last.get("Close")) else None,
+        "EMA13": ema13,
+        "EMA13 Distance %": ema13_dist,
+        "EMA13 Abs Distance %": abs(ema13_dist) if ema13_dist is not None else None,
         "Scan Start": str(df.index[0].date()),
         # The selected date is an upper bound. If the market was closed or
         # today's candle is not published yet, show the actual candle used.
